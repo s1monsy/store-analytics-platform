@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Store, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
+import { supabase } from "@/lib/supabase"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,8 +26,12 @@ export default function LoginPage() {
       return
     }
     setLoading(true)
-    // Mock login delay
-    await new Promise((r) => setTimeout(r, 800))
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      toast.error("Невірний email або пароль")
+      setLoading(false)
+      return
+    }
     toast.success("Вхід виконано успішно")
     router.push("/dashboard")
   }
