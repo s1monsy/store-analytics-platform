@@ -33,7 +33,7 @@ export default function LoginPage() {
       return
     }
     toast.success("Вхід виконано успішно")
-    router.push("/dashboard")
+    window.location.href = "/dashboard"
   }
 
   return (

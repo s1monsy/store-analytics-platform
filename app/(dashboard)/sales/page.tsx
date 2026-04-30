@@ -33,14 +33,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, Search, PackageOpen } from "lucide-react"
+import { PageSpinner } from "@/components/ui/spinner"
+import { Plus, Pencil, Trash2, Search, PackageOpen, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 import { format, parseISO } from "date-fns"
 import { uk } from "date-fns/locale"
 import type { SaleEntry } from "@/lib/store"
 
 export default function SalesPage() {
-  const { sales, addSale, updateSale, deleteSale } = useStore()
+  const { sales, salesLoading, salesError, refetchSales, addSale, updateSale, deleteSale } = useStore()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<SaleEntry | null>(null)
@@ -93,6 +94,28 @@ export default function SalesPage() {
       setDeleteId(null)
       toast.success("Запис видалено")
     }
+  }
+
+  if (salesLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Продажі" />
+        <PageSpinner />
+      </div>
+    )
+  }
+
+  if (salesError) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Продажі" />
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+          <AlertTriangle className="h-8 w-8 text-destructive" />
+          <p className="text-sm">{salesError}</p>
+          <Button variant="outline" size="sm" onClick={refetchSales}>Спробувати знову</Button>
+        </div>
+      </div>
+    )
   }
 
   return (

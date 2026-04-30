@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+import { PageSpinner } from "@/components/ui/spinner"
 import {
   Plus,
   Pencil,
@@ -34,13 +35,14 @@ import {
   Minus,
   PackageOpen,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react"
 import { toast } from "sonner"
 import type { InventoryItem } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
 export default function InventoryPage() {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, adjustQty } =
+  const { inventory, inventoryLoading, inventoryError, refetchInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, adjustQty } =
     useStore()
 
   const [formOpen, setFormOpen] = useState(false)
@@ -79,6 +81,28 @@ export default function InventoryPage() {
       setDeleteId(null)
       toast.success("Товар видалено")
     }
+  }
+
+  if (inventoryLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Склад" />
+        <PageSpinner />
+      </div>
+    )
+  }
+
+  if (inventoryError) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Склад" />
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+          <AlertTriangle className="h-8 w-8 text-destructive" />
+          <p className="text-sm">{inventoryError}</p>
+          <Button variant="outline" size="sm" onClick={refetchInventory}>Спробувати знову</Button>
+        </div>
+      </div>
+    )
   }
 
   return (

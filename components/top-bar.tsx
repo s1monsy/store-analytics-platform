@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
@@ -12,11 +13,15 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useStore } from "@/lib/store-context"
 import { LogOut, User, Settings } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 
 export function TopBar({ title }: { title: string }) {
   const { userProfile, storeProfile } = useStore()
-  const router = useRouter()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    window.location.href = "/login"
+  }
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
@@ -49,16 +54,20 @@ export function TopBar({ title }: { title: string }) {
             <p className="text-xs text-muted-foreground">{userProfile.email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/profile")}>
-            <User className="mr-2 h-4 w-4" />
-            Профіль
+          <DropdownMenuItem asChild>
+            <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              Профіль
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/settings")}>
-            <Settings className="mr-2 h-4 w-4" />
-            Налаштування
+          <DropdownMenuItem asChild>
+            <Link href="/settings">
+              <Settings className="mr-2 h-4 w-4" />
+              Налаштування
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/login")}>
+          <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Вийти
           </DropdownMenuItem>

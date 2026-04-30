@@ -36,6 +36,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { storeProfile } = useStore()
 
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="px-4 py-5">

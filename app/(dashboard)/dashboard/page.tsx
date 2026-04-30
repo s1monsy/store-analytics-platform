@@ -11,6 +11,8 @@ import { DailySalesChart } from "@/components/daily-sales-chart"
 import { CategoryPieChart } from "@/components/category-pie-chart"
 import { RecentActivityTable } from "@/components/recent-activity-table"
 import { Button } from "@/components/ui/button"
+import { PageSpinner } from "@/components/ui/spinner"
+import { AlertTriangle } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
@@ -21,7 +23,7 @@ import { CalendarIcon, Banknote, Receipt, TrendingUp, RotateCcw } from "lucide-r
 import { cn } from "@/lib/utils"
 
 export default function DashboardPage() {
-  const { sales } = useStore()
+  const { sales, salesLoading, salesError, refetchSales } = useStore()
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 7),
     to: new Date(),
@@ -35,6 +37,28 @@ export default function DashboardPage() {
     () => getDailyAggregates(sales, dateFrom, dateTo),
     [sales, dateFrom, dateTo]
   )
+
+  if (salesLoading) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Дашборд" />
+        <PageSpinner />
+      </div>
+    )
+  }
+
+  if (salesError) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Дашборд" />
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+          <AlertTriangle className="h-8 w-8 text-destructive" />
+          <p className="text-sm">{salesError}</p>
+          <Button variant="outline" size="sm" onClick={refetchSales}>Спробувати знову</Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col">
