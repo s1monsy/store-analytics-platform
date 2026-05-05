@@ -10,6 +10,8 @@ import { getDailyAggregates, getTotals } from "@/lib/store"
 import { DailySalesChart } from "@/components/charts/dailySalesChart"
 import { CategoryPieChart } from "@/components/charts/categoryPieChart"
 import { RecentActivityTable } from "@/components/dashboard/recentActivityTable"
+import { SaleFormModal } from "@/components/modals/saleFormModal"
+import { InventoryFormModal } from "@/components/modals/inventoryFormModal"
 import { Button } from "@/components/ui/button"
 import { PageSpinner } from "@/components/ui/spinner"
 import { AlertTriangle } from "lucide-react"
@@ -19,15 +21,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { CalendarIcon, Banknote, Receipt, TrendingUp, RotateCcw } from "lucide-react"
+import { CalendarIcon, Banknote, Receipt, TrendingUp, RotateCcw, Plus, PackagePlus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function DashboardPage() {
-  const { sales, salesLoading, salesError, refetchSales } = useStore()
+  const { sales, salesLoading, salesError, refetchSales, addSale, addInventoryItem } = useStore()
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 7),
     to: new Date(),
   })
+  const [saleModalOpen, setSaleModalOpen] = useState(false)
+  const [inventoryModalOpen, setInventoryModalOpen] = useState(false)
 
   const dateFrom = format(dateRange.from, "yyyy-MM-dd")
   const dateTo = format(dateRange.to, "yyyy-MM-dd")
@@ -61,11 +66,13 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
     <div className="flex flex-col">
       <TopBar title="Дашборд" />
       <div className="flex-1 overflow-auto p-4 lg:p-6">
-        {/* Date Range Picker */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
+        {/* Quick Actions + Date Range Picker */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -118,6 +125,17 @@ export default function DashboardPage() {
               </Button>
             ))}
           </div>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setInventoryModalOpen(true)}>
+              <PackagePlus className="mr-2 h-4 w-4" />
+              Прихід товару
+            </Button>
+            <Button size="sm" onClick={() => setSaleModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Додати продаж
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -163,5 +181,25 @@ export default function DashboardPage() {
         <RecentActivityTable sales={sales} />
       </div>
     </div>
+
+    <SaleFormModal
+      open={saleModalOpen}
+      onOpenChange={setSaleModalOpen}
+      onSubmit={async (data) => {
+        await addSale(data)
+        setSaleModalOpen(false)
+        toast.success("Продаж додано")
+      }}
+    />
+    <InventoryFormModal
+      open={inventoryModalOpen}
+      onOpenChange={setInventoryModalOpen}
+      onSubmit={async (data) => {
+        await addInventoryItem(data)
+        setInventoryModalOpen(false)
+        toast.success("Товар додано")
+      }}
+    />
+    </>
   )
 }

@@ -34,11 +34,22 @@ import {
 } from "@/components/ui/alertDialog"
 import { Badge } from "@/components/ui/badge"
 import { PageSpinner } from "@/components/ui/spinner"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"
 import { Plus, Pencil, Trash2, Search, PackageOpen, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 import { format, parseISO } from "date-fns"
 import { uk } from "date-fns/locale"
 import type { SaleEntry } from "@/lib/store"
+
+const PAGE_SIZE = 2
 
 export default function SalesPage() {
   const { sales, salesLoading, salesError, refetchSales, addSale, updateSale, deleteSale } = useStore()
@@ -46,6 +57,7 @@ export default function SalesPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<SaleEntry | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   // Filters
   const [search, setSearch] = useState("")
@@ -73,6 +85,10 @@ export default function SalesPage() {
       })
       .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))
   }, [sales, dateFrom, dateTo, shiftFilter, paymentFilter, search])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   const handleEdit = (sale: SaleEntry) => {
     setEditingSale(sale)
@@ -213,7 +229,7 @@ export default function SalesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((sale) => (
+                  {paginated.map((sale) => (
                     <TableRow key={sale.id}>
                       <TableCell className="text-sm">
                         {format(parseISO(sale.date), "dd.MM.yy", { locale: uk })}
@@ -277,6 +293,56 @@ export default function SalesPage() {
             )}
           </CardContent>
         </Card>
+
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center text-sm text-muted-foreground">
+            <span className="shrink-0 w-1/3">
+              {filtered.length} записів, сторінка {safePage} з {totalPages}
+            </span>
+            <Pagination className="mx-0 w-1/3">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    aria-disabled={safePage === 1}
+                    className={safePage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                  .reduce<(number | "ellipsis")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("ellipsis")
+                    acc.push(p)
+                    return acc
+                  }, [])
+                  .map((p, idx) =>
+                    p === "ellipsis" ? (
+                      <PaginationItem key={`ellipsis-${idx}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          isActive={p === safePage}
+                          onClick={() => setPage(p)}
+                          className="cursor-pointer"
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    aria-disabled={safePage === totalPages}
+                    className={safePage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
 
       <SaleFormModal
