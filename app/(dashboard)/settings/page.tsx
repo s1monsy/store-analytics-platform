@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { TopBar } from "@/components/top-bar"
+import { TopBar } from "@/components/layout/topBar"
 import { useStore } from "@/lib/store-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

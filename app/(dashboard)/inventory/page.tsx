@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { TopBar } from "@/components/top-bar"
+import { TopBar } from "@/components/layout/topBar"
 import { useStore } from "@/lib/store-context"
-import { InventoryFormModal } from "@/components/inventory-form-modal"
+import { InventoryFormModal } from "@/components/modals/inventoryFormModal"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -24,7 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alertDialog"
 import { Badge } from "@/components/ui/badge"
 import { PageSpinner } from "@/components/ui/spinner"
 import {

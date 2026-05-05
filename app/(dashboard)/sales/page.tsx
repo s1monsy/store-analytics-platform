@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { TopBar } from "@/components/top-bar"
+import { TopBar } from "@/components/layout/topBar"
 import { useStore } from "@/lib/store-context"
-import { SaleFormModal } from "@/components/sale-form-modal"
+import { SaleFormModal } from "@/components/modals/saleFormModal"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,7 +31,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alertDialog"
 import { Badge } from "@/components/ui/badge"
 import { PageSpinner } from "@/components/ui/spinner"
 import { Plus, Pencil, Trash2, Search, PackageOpen, AlertTriangle } from "lucide-react"

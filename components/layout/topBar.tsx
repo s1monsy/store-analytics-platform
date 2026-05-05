@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useStore } from "@/lib/store-context"
 
-const UserMenu = dynamic(() => import("@/components/user-menu"), { ssr: false })
+const UserMenu = dynamic(() => import("@/components/layout/userMenu"), { ssr: false })
 
 export function TopBar({ title }: { title: string }) {
   const { storeProfile } = useStore()

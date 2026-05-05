@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { TopBar } from "@/components/top-bar"
+import { TopBar } from "@/components/layout/topBar"
 import { useStore } from "@/lib/store-context"
 import { getDailyAggregates, getTotals } from "@/lib/store"
-import { StatsCard } from "@/components/stats-card"
+import { StatsCard } from "@/components/dashboard/statsCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,6 +23,7 @@ import {
   TrendingUp,
   RotateCcw,
   FileDown,
+  Printer,
   CalendarDays,
   ArrowUp,
   ArrowDown,
@@ -76,9 +77,9 @@ export default function ReportsPage() {
   return (
     <div className="flex flex-col">
       <TopBar title="Звіти" />
-      <div className="flex-1 overflow-auto p-4 lg:p-6">
+      <div className="flex-1 overflow-auto p-4 lg:p-6 print:p-0 print:overflow-visible">
         {/* Date Range Selector */}
-        <Card className="mb-6">
+        <Card className="mb-6 print:hidden">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex flex-col gap-2">
@@ -105,11 +106,25 @@ export default function ReportsPage() {
                 onClick={handleExportCSV}
               >
                 <FileDown className="mr-2 h-4 w-4" />
-                Export CSV
+                Експорт CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.print()}
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Друк / PDF
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Print header — visible only when printing */}
+        <div className="hidden print:block mb-6">
+          <h1 className="text-xl font-bold">Звіт за період</h1>
+          <p className="text-sm text-gray-500">{dateFrom} — {dateTo}</p>
+        </div>
 
         {/* Summary Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

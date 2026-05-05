@@ -19,6 +19,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuBadge,
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
@@ -34,8 +35,9 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { storeProfile } = useStore()
+  const { storeProfile, inventory } = useStore()
 
+  const lowStockCount = inventory.filter((i) => i.qty <= i.minQty).length
 
   return (
     <Sidebar collapsible="icon">
@@ -54,20 +56,32 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) => {
+                const isInventory = item.href === "/inventory"
+                const tooltipText = isInventory && lowStockCount > 0
+                  ? `${item.title} — ${lowStockCount} товар${lowStockCount === 1 ? "" : lowStockCount < 5 ? "и" : "ів"} з низьким залишком`
+                  : item.title
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                      tooltip={tooltipText}
+                    >
+                      <Link href={item.href}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {isInventory && lowStockCount > 0 && (
+                      <SidebarMenuBadge className="bg-destructive text-destructive-foreground">
+                        {lowStockCount}
+                      </SidebarMenuBadge>
+                    )}
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
