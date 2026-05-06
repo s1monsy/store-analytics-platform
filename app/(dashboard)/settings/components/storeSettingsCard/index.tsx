@@ -10,7 +10,8 @@ import {
   SelectTrigger,
 } from "@/shared/components/ui/select"
 import { Store } from "lucide-react"
-import { CURRENCIES, TIMEZONES } from "@/shared/constants"
+import { TIMEZONES } from "@/shared/constants"
+import { useExchangeRates } from "@/shared/hooks/useExchangeRates"
 import type { StoreProfile } from "@/shared/types"
 
 interface StoreSettingsCardProps {
@@ -21,7 +22,8 @@ interface StoreSettingsCardProps {
 }
 
 export function StoreSettingsCard({ store, hasChanges, onStoreChange, onSave }: StoreSettingsCardProps) {
-  const selectedCurrency = CURRENCIES.find((c) => c.value === store.currency)
+  const { currencies, loading: ratesLoading } = useExchangeRates()
+  const selectedCurrency = currencies.find((c) => c.value === store.currency)
   const selectedTimezone = TIMEZONES.find((t) => t.value === store.timezone)
 
   return (
@@ -63,7 +65,7 @@ export function StoreSettingsCard({ store, hasChanges, onStoreChange, onSave }: 
                 </span>
               </SelectTrigger>
               <SelectContent>
-                {CURRENCIES.map((c) => (
+                {currencies.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     {c.value} — {c.label}
                   </SelectItem>
@@ -74,6 +76,8 @@ export function StoreSettingsCard({ store, hasChanges, onStoreChange, onSave }: 
               <p className="text-xs text-muted-foreground">
                 {selectedCurrency.value === "UAH"
                   ? "Базова валюта"
+                  : ratesLoading
+                  ? "Завантаження курсу..."
                   : `1 ${selectedCurrency.value} ≈ ${selectedCurrency.uahRate.toFixed(2)} UAH`}
               </p>
             )}
