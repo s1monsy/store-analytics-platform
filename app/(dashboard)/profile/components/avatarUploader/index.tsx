@@ -40,13 +40,11 @@ export function AvatarUploader({
             className="group relative h-16 w-16 shrink-0 rounded-full outline-none"
           >
             <Avatar className="h-16 w-16">
-              {avatarUrl && (
-                <AvatarImage
-                  src={avatarUrl}
-                  alt={name}
-                  className="h-full w-full object-cover object-[50%_30%]"
-                />
-              )}
+              <AvatarImage
+                src={avatarUrl || undefined}
+                alt={name}
+                className="h-full w-full object-cover object-[50%_30%]"
+              />
               <AvatarFallback className="bg-primary text-lg text-primary-foreground">
                 {initials || "?"}
               </AvatarFallback>
