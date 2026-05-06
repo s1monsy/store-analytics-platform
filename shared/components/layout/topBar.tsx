@@ -1,6 +1,5 @@
 ﻿"use client"
 
-import Link from "next/link"
 import dynamic from "next/dynamic"
 import { SidebarTrigger } from "@/shared/components/ui/sidebar"
 import { useStore } from "@/shared/lib/store-context"
