@@ -1,0 +1,63 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import { format, subDays } from "date-fns"
+import { toast } from "sonner"
+import { useStore } from "@/shared/lib/store-context"
+import { getDailyAggregates, getTotals } from "@/shared/lib/store"
+
+export function useReportsPage() {
+  const { sales } = useStore()
+
+  const [dateFrom, setDateFrom] = useState(format(subDays(new Date(), 30), "yyyy-MM-dd"))
+  const [dateTo, setDateTo] = useState(format(new Date(), "yyyy-MM-dd"))
+
+  const totals = useMemo(() => getTotals(sales, dateFrom, dateTo), [sales, dateFrom, dateTo])
+  const dailyData = useMemo(
+    () => getDailyAggregates(sales, dateFrom, dateTo),
+    [sales, dateFrom, dateTo]
+  )
+
+  const bestDay = useMemo(() => {
+    if (dailyData.length === 0) return null
+    return dailyData.reduce((max, d) => (d.revenue > max.revenue ? d : max), dailyData[0])
+  }, [dailyData])
+
+  const worstDay = useMemo(() => {
+    if (dailyData.length === 0) return null
+    return dailyData.reduce((min, d) => (d.revenue < min.revenue ? d : min), dailyData[0])
+  }, [dailyData])
+
+  const handleExportCSV = () => {
+    const headers = ["Дата", "Виручка (грн)", "Чеки", "Сер. чек (грн)", "Повернення (грн)", "Нетто (грн)"]
+    const rows = dailyData.map((d) => [
+      d.date,
+      d.revenue,
+      d.receipts,
+      d.avgCheck,
+      d.returns,
+      (d.revenue - d.returns).toFixed(2),
+    ])
+    const csv = [headers, ...rows].map((r) => r.join(";")).join("\n")
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `звіт_${dateFrom}_${dateTo}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success("CSV файл завантажено")
+  }
+
+  return {
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    totals,
+    dailyData,
+    bestDay,
+    worstDay,
+    handleExportCSV,
+  }
+}

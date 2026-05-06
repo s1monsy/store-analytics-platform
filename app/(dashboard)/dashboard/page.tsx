@@ -1,39 +1,37 @@
-﻿"use client"
+"use client"
 
-import { useMemo, useState } from "react"
-import { format, subDays } from "date-fns"
 import { TopBar } from "@/shared/components/layout/topBar"
-import { useStore } from "@/shared/lib/store-context"
-import { getDailyAggregates, getTotals } from "@/shared/lib/store"
 import { DailySalesChart } from "@/shared/components/charts/dailySalesChart"
 import { CategoryPieChart } from "@/shared/components/charts/categoryPieChart"
 import { RecentActivityTable } from "@/shared/components/dashboard/recentActivityTable"
 import { SaleFormModal } from "@/shared/components/modals/saleFormModal"
 import { InventoryFormModal } from "@/shared/components/modals/inventoryFormModal"
-import { Button } from "@/shared/components/ui/button"
 import { PageSpinner } from "@/shared/components/ui/spinner"
+import { Button } from "@/shared/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
 import { DashboardToolbar } from "./components/dashboardToolbar"
 import { DashboardSummaryCards } from "./components/dashboardSummaryCards"
+import { useDashboardPage } from "./hooks/useDashboardPage"
 
 export default function DashboardPage() {
-  const { sales, salesLoading, salesError, refetchSales, addSale, addInventoryItem } = useStore()
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
-  })
-  const [saleModalOpen, setSaleModalOpen] = useState(false)
-  const [inventoryModalOpen, setInventoryModalOpen] = useState(false)
-
-  const dateFrom = format(dateRange.from, "yyyy-MM-dd")
-  const dateTo = format(dateRange.to, "yyyy-MM-dd")
-
-  const totals = useMemo(() => getTotals(sales, dateFrom, dateTo), [sales, dateFrom, dateTo])
-  const dailyData = useMemo(
-    () => getDailyAggregates(sales, dateFrom, dateTo),
-    [sales, dateFrom, dateTo]
-  )
+  const {
+    sales,
+    salesLoading,
+    salesError,
+    refetchSales,
+    dateRange,
+    setDateRange,
+    dateFrom,
+    dateTo,
+    totals,
+    dailyData,
+    saleModalOpen,
+    setSaleModalOpen,
+    inventoryModalOpen,
+    setInventoryModalOpen,
+    handleAddSale,
+    handleAddInventory,
+  } = useDashboardPage()
 
   if (salesLoading) {
     return (
@@ -90,20 +88,12 @@ export default function DashboardPage() {
       <SaleFormModal
         open={saleModalOpen}
         onOpenChange={setSaleModalOpen}
-        onSubmit={async (data) => {
-          await addSale(data)
-          setSaleModalOpen(false)
-          toast.success("Продаж додано")
-        }}
+        onSubmit={handleAddSale}
       />
       <InventoryFormModal
         open={inventoryModalOpen}
         onOpenChange={setInventoryModalOpen}
-        onSubmit={async (data) => {
-          await addInventoryItem(data)
-          setInventoryModalOpen(false)
-          toast.success("Товар додано")
-        }}
+        onSubmit={handleAddInventory}
       />
     </>
   )

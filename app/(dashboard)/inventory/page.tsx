@@ -1,76 +1,41 @@
-﻿"use client"
+"use client"
 
-import { useState } from "react"
 import { TopBar } from "@/shared/components/layout/topBar"
-import { useStore } from "@/shared/lib/store-context"
 import { InventoryFormModal } from "@/shared/components/modals/inventoryFormModal"
-import { Button } from "@/shared/components/ui/button"
 import { PageSpinner } from "@/shared/components/ui/spinner"
+import { Button } from "@/shared/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
-import type { InventoryItem } from "@/shared/lib/store"
 import { LowStockBanner } from "./components/lowStockBanner"
 import { InventoryToolbar } from "./components/inventoryToolbar"
 import { InventoryTable } from "./components/inventoryTable"
 import { DeleteConfirmDialog } from "../sales/components/deleteConfirmDialog"
-
-const PAGE_SIZE = 2
+import { useInventoryPage } from "./hooks/useInventoryPage"
 
 export default function InventoryPage() {
   const {
-    inventory,
     inventoryLoading,
     inventoryError,
     refetchInventory,
-    addInventoryItem,
-    updateInventoryItem,
-    deleteInventoryItem,
     adjustQty,
-  } = useStore()
-
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [search, setSearch] = useState("")
-  const [page, setPage] = useState(1)
-
-  const filtered = inventory.filter((item) => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q)
-  })
-
-  const lowStockCount = inventory.filter((i) => i.qty < i.minQty).length
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const safePage = Math.min(page, totalPages)
-  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
-
-  const handleEdit = (item: InventoryItem) => {
-    setEditingItem(item)
-    setFormOpen(true)
-  }
-
-  const handleFormSubmit = (data: Omit<InventoryItem, "id" | "updatedAt">) => {
-    if (editingItem) {
-      updateInventoryItem(editingItem.id, data)
-    } else {
-      addInventoryItem(data)
-    }
-    setEditingItem(null)
-  }
-
-  const handleDelete = () => {
-    if (deleteId) {
-      deleteInventoryItem(deleteId)
-      setDeleteId(null)
-      toast.success("Товар видалено")
-    }
-  }
-
-  const openAddForm = () => {
-    setEditingItem(null)
-    setFormOpen(true)
-  }
+    filtered,
+    paginated,
+    page,
+    totalPages,
+    setPage,
+    lowStockCount,
+    formOpen,
+    setFormOpen,
+    editingItem,
+    setEditingItem,
+    deleteId,
+    setDeleteId,
+    search,
+    setSearch,
+    openAddForm,
+    handleEdit,
+    handleFormSubmit,
+    handleDelete,
+  } = useInventoryPage()
 
   if (inventoryLoading) {
     return (
@@ -107,7 +72,7 @@ export default function InventoryPage() {
         <InventoryTable
           paginated={paginated}
           filtered={filtered}
-          page={safePage}
+          page={page}
           totalPages={totalPages}
           onPageChange={setPage}
           onEdit={handleEdit}
