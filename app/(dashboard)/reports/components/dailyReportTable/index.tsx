@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+﻿import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import {
   Table,
   TableBody,
@@ -6,11 +6,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/shared/components/ui/table"
 import { CalendarDays } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { uk } from "date-fns/locale"
-import { getDailyAggregates } from "@/lib/store"
+import { getDailyAggregates } from "@/shared/lib/store"
 
 type DailyAggregate = ReturnType<typeof getDailyAggregates>[number]
 

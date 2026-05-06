@@ -1,4 +1,4 @@
-import { StatsCard } from "@/components/dashboard/statsCard"
+﻿import { StatsCard } from "@/shared/components/dashboard/statsCard"
 import { Banknote, Receipt, TrendingUp, RotateCcw } from "lucide-react"
 
 interface SummaryCardsProps {

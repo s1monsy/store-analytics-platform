@@ -1,8 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card"
+﻿import { Card, CardContent } from "@/shared/components/ui/card"
 import { ArrowUp, ArrowDown } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { uk } from "date-fns/locale"
-import { getDailyAggregates } from "@/lib/store"
+import { getDailyAggregates } from "@/shared/lib/store"
 
 type DailyAggregate = ReturnType<typeof getDailyAggregates>[number]
 

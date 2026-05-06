@@ -1,9 +1,9 @@
-"use client"
+﻿"use client"
 
 import { useState, useMemo } from "react"
-import { TopBar } from "@/components/layout/topBar"
-import { useStore } from "@/lib/store-context"
-import { getDailyAggregates, getTotals } from "@/lib/store"
+import { TopBar } from "@/shared/components/layout/topBar"
+import { useStore } from "@/shared/lib/store-context"
+import { getDailyAggregates, getTotals } from "@/shared/lib/store"
 import { DateRangePicker } from "./components/dateRangePicker"
 import { SummaryCards } from "./components/summaryCards"
 import { BestWorstDay } from "./components/bestWorstDay"
