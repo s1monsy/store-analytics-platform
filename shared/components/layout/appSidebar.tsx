@@ -37,13 +37,13 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { storeProfile, inventory } = useStore()
 
-  const lowStockCount = inventory.filter((i) => i.qty <= i.minQty).length
+  const lowStockCount = inventory.filter((i) => i.qty < i.minQty).length
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="px-4 py-5">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+      <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+        <Link href="/dashboard" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Store className="h-4 w-4 text-primary-foreground" />
           </div>
           <span className="text-sm font-semibold text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden">
@@ -86,7 +86,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="px-4 py-3 group-data-[collapsible=icon]:px-2">
+      <SidebarFooter className="px-4 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
         <p className="text-xs text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden truncate">
           {storeProfile.name}
         </p>

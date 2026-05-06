@@ -1,4 +1,4 @@
-﻿import { format, subDays } from "date-fns";
+﻿import { format, subDays, differenceInCalendarDays, startOfDay } from "date-fns";
 import { uk } from "date-fns/locale";
 import { Button } from "@/shared/components/ui/button";
 import { Calendar } from "@/shared/components/ui/calendar";
@@ -24,12 +24,23 @@ interface DashboardToolbarProps {
   onAddInventory: () => void;
 }
 
+function getActivePreset(dateRange: DateRange): number | null {
+  const today = startOfDay(new Date())
+  const rangeEnd = startOfDay(dateRange.to)
+  const rangeFrom = startOfDay(dateRange.from)
+  if (differenceInCalendarDays(today, rangeEnd) !== 0) return null
+  const days = differenceInCalendarDays(today, rangeFrom)
+  return PRESETS.find((p) => p.days === days)?.days ?? null
+}
+
 export function DashboardToolbar({
   dateRange,
   onDateRangeChange,
   onAddSale,
   onAddInventory,
 }: DashboardToolbarProps) {
+  const activePreset = getActivePreset(dateRange)
+
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap items-center gap-2">
@@ -67,7 +78,7 @@ export function DashboardToolbar({
           {PRESETS.map((preset) => (
             <Button
               key={preset.days}
-              variant="ghost"
+              variant={activePreset === preset.days ? "secondary" : "ghost"}
               size="sm"
               onClick={() =>
                 onDateRangeChange({ from: subDays(new Date(), preset.days), to: new Date() })
