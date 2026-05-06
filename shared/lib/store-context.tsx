@@ -13,6 +13,8 @@ import {
   insertInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
+  fetchStoreSettings,
+  upsertStoreSettings,
 } from "./db";
 
 interface StoreContextType {
@@ -30,6 +32,7 @@ interface StoreContextType {
   deleteInventoryItem: (id: string) => Promise<void>;
   adjustQty: (id: string, delta: number) => Promise<void>;
   storeProfile: StoreProfile;
+  storeProfileLoading: boolean;
   setStoreProfile: (profile: StoreProfile) => void;
   userProfile: UserProfile;
   setUserProfile: (profile: UserProfile) => void;
@@ -47,6 +50,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [inventoryError, setInventoryError] = useState<string | null>(null);
   const [storeProfile, setStoreProfile] = useState<StoreProfile>(defaultStoreProfile);
+  const [storeProfileLoading, setStoreProfileLoading] = useState(true);
+
+  const saveStoreProfile = useCallback(async (profile: StoreProfile) => {
+    setStoreProfile(profile)
+    try {
+      await upsertStoreSettings(profile)
+    } catch {
+      toast.error("Не вдалося зберегти налаштування")
+    }
+  }, []);
   const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
 
   const refetchSales = useCallback(() => {
@@ -69,6 +82,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { refetchSales(); }, [refetchSales]);
   useEffect(() => { refetchInventory(); }, [refetchInventory]);
+  useEffect(() => {
+    fetchStoreSettings()
+      .then((profile) => { if (profile) setStoreProfile(profile) })
+      .catch(() => {})
+      .finally(() => setStoreProfileLoading(false))
+  }, []);
 
   const addSale = useCallback(async (sale: Omit<SaleEntry, "id">) => {
     try {
@@ -160,7 +179,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         deleteInventoryItem: deleteInventoryItemFn,
         adjustQty,
         storeProfile,
-        setStoreProfile,
+        storeProfileLoading,
+        setStoreProfile: saveStoreProfile,
         userProfile,
         setUserProfile,
         refetchSales,

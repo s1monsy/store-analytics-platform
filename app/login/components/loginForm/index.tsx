@@ -7,14 +7,14 @@ import { Label } from "@/shared/components/ui/label"
 import { Checkbox } from "@/shared/components/ui/checkbox"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { Eye, EyeOff } from "lucide-react"
-import { toast } from "sonner"
 
 interface LoginFormProps {
   loading: boolean
   onSubmit: (email: string, password: string) => void
+  onForgotPassword: (email: string) => void
 }
 
-export function LoginForm({ loading, onSubmit }: LoginFormProps) {
+export function LoginForm({ loading, onSubmit, onForgotPassword }: LoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -81,7 +81,7 @@ export function LoginForm({ loading, onSubmit }: LoginFormProps) {
             <button
               type="button"
               className="text-sm text-primary hover:underline"
-              onClick={() => toast.info("Зверніться до адміністратора для відновлення пароля")}
+              onClick={() => onForgotPassword(email)}
             >
               Забули пароль?
             </button>

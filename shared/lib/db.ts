@@ -1,5 +1,6 @@
 import { supabase } from "./supabase"
 import type { SaleEntry, InventoryItem } from "./store"
+import type { StoreProfile } from "@/shared/types"
 
 export async function fetchSales(): Promise<SaleEntry[]> {
   const { data, error } = await supabase
@@ -129,5 +130,40 @@ export async function updateInventoryItem(
 
 export async function deleteInventoryItem(id: string): Promise<void> {
   const { error } = await supabase.from("inventory").delete().eq("id", id)
+  if (error) throw error
+}
+
+export async function fetchStoreSettings(): Promise<StoreProfile | null> {
+  const { data, error } = await supabase
+    .from("store_settings")
+    .select("*")
+    .maybeSingle()
+
+  if (error) throw error
+  if (!data) return null
+
+  return {
+    name: data.name,
+    address: data.address,
+    currency: data.currency,
+    timezone: data.timezone,
+  }
+}
+
+export async function upsertStoreSettings(profile: StoreProfile): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Not authenticated")
+
+  const { error } = await supabase
+    .from("store_settings")
+    .upsert({
+      user_id: user.id,
+      name: profile.name,
+      address: profile.address,
+      currency: profile.currency,
+      timezone: profile.timezone,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" })
+
   if (error) throw error
 }

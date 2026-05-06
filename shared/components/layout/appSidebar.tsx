@@ -35,7 +35,7 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { storeProfile, inventory } = useStore()
+  const { storeProfile, storeProfileLoading, inventory } = useStore()
 
   const lowStockCount = inventory.filter((i) => i.qty < i.minQty).length
 
@@ -87,9 +87,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="px-4 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
-        <p className="text-xs text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden truncate">
-          {storeProfile.name}
-        </p>
+        {!storeProfileLoading && (
+          <p className="text-xs text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden truncate">
+            {storeProfile.name}
+          </p>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

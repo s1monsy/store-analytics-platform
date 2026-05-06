@@ -21,11 +21,26 @@ export default function LoginPage() {
     window.location.href = "/dashboard"
   }
 
+  const handleForgotPassword = async (email: string) => {
+    if (!email) {
+      toast.error("Введіть email щоб відновити пароль")
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) {
+      toast.error("Не вдалося надіслати лист")
+    } else {
+      toast.success("Лист з інструкціями надіслано на вашу пошту")
+    }
+  }
+
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <LoginHeader />
-        <LoginForm loading={loading} onSubmit={handleSubmit} />
+        <LoginForm loading={loading} onSubmit={handleSubmit} onForgotPassword={handleForgotPassword} />
         <p className="mt-6 text-center text-xs text-muted-foreground">
           TradePoint Data &copy; {new Date().getFullYear()}
         </p>
